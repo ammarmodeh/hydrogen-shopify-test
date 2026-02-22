@@ -3,31 +3,23 @@ import {
   Outlet,
   useRouteError,
   isRouteErrorResponse,
-  type ShouldRevalidateFunction,
   Links,
   Meta,
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
 } from 'react-router';
-import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
-import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
-
-export type RootLoader = typeof loader;
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
+ * @type {ShouldRevalidateFunction}
  */
-export const shouldRevalidate: ShouldRevalidateFunction = ({
-  formMethod,
-  currentUrl,
-  nextUrl,
-}) => {
+export const shouldRevalidate = ({formMethod, currentUrl, nextUrl}) => {
   // revalidate when a mutation is performed e.g add to cart, login...
   if (formMethod && formMethod !== 'GET') return true;
 
@@ -66,7 +58,10 @@ export function links() {
   ];
 }
 
-export async function loader(args: Route.LoaderArgs) {
+/**
+ * @param {Route.LoaderArgs} args
+ */
+export async function loader(args) {
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
 
@@ -97,8 +92,9 @@ export async function loader(args: Route.LoaderArgs) {
 /**
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
+ * @param {Route.LoaderArgs}
  */
-async function loadCriticalData({context}: Route.LoaderArgs) {
+async function loadCriticalData({context}) {
   const {storefront} = context;
 
   const [header] = await Promise.all([
@@ -118,8 +114,9 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
  * Load data for rendering content below the fold. This data is deferred and will be
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
+ * @param {Route.LoaderArgs}
  */
-function loadDeferredData({context}: Route.LoaderArgs) {
+function loadDeferredData({context}) {
   const {storefront, customerAccount, cart} = context;
 
   // defer the footer query (below the fold)
@@ -130,7 +127,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
         footerMenuHandle: 'footer', // Adjust to your footer menu handle
       },
     })
-    .catch((error: Error) => {
+    .catch((error) => {
       // Log query errors, but don't throw them so the page can still render
       console.error(error);
       return null;
@@ -142,7 +139,10 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   };
 }
 
-export function Layout({children}: {children?: React.ReactNode}) {
+/**
+ * @param {{children?: React.ReactNode}}
+ */
+export function Layout({children}) {
   const nonce = useNonce();
 
   return (
@@ -150,7 +150,6 @@ export function Layout({children}: {children?: React.ReactNode}) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
@@ -166,7 +165,8 @@ export function Layout({children}: {children?: React.ReactNode}) {
 }
 
 export default function App() {
-  const data = useRouteLoaderData<RootLoader>('root');
+  /** @type {RootLoader} */
+  const data = useRouteLoaderData('root');
 
   if (!data) {
     return <Outlet />;
@@ -209,3 +209,9 @@ export function ErrorBoundary() {
     </div>
   );
 }
+
+/** @typedef {LoaderReturnData} RootLoader */
+
+/** @typedef {import('react-router').ShouldRevalidateFunction} ShouldRevalidateFunction */
+/** @typedef {import('./+types/root').Route} Route */
+/** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */
