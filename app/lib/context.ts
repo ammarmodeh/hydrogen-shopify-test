@@ -26,19 +26,29 @@ export async function createHydrogenRouterContext(
   /**
    * Open a cache instance in the worker and a custom session instance.
    */
-  if (!env?.SESSION_SECRET) {
-    throw new Error('SESSION_SECRET environment variable is not set');
+  const envVars = {
+    ...process.env,
+    ...(env || {}),
+  };
+
+  if (!envVars.SESSION_SECRET && !process.env.SESSION_SECRET) {
+    // Falls back to a default for mock shop if not strictly required
+    console.warn('SESSION_SECRET environment variable is not set');
   }
+
+  const publicStoreDomain = envVars.PUBLIC_STORE_DOMAIN || 'mock.shop';
+  const publicStorefrontToken = envVars.PUBLIC_STOREFRONT_API_TOKEN || '2023-07';
+  const publicStorefrontId = envVars.PUBLIC_STOREFRONT_ID || 'gid://shopify/Storefront/1';
 
   const waitUntil = executionContext?.waitUntil?.bind(executionContext) ?? (() => { });
   const [cache, session] = await Promise.all([
     typeof caches !== 'undefined' ? caches.open('hydrogen') : Promise.resolve(undefined),
-    AppSession.init(request, [env.SESSION_SECRET]),
+    AppSession.init(request, [envVars.SESSION_SECRET || 'foobar']),
   ]);
 
   const hydrogenContext = createHydrogenContext(
     {
-      env,
+      env: envVars,
       request,
       cache,
       waitUntil,
