@@ -11,7 +11,7 @@ import { vercelPreset } from '@vercel/react-router/vite';
  */
 export default {
   presets: [
-    hydrogenPreset(),
+    !process.env.VERCEL && hydrogenPreset(),
     process.env.VERCEL && vercelPreset(),
   ].filter(Boolean),
 } satisfies Config;
