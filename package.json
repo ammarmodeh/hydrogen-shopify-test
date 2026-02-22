@@ -16,6 +16,7 @@
   "dependencies": {
     "@shopify/hydrogen": "2026.1.0",
     "@vercel/node": "^5.6.6",
+    "@vercel/react-router": "^1.2.5",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
     "isbot": "^5.1.22",
