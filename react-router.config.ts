@@ -1,5 +1,5 @@
-import type {Config} from '@react-router/dev/config';
-import {hydrogenPreset} from '@shopify/hydrogen/react-router-preset';
+import type { Config } from '@react-router/dev/config';
+import { hydrogenPreset } from '@shopify/hydrogen/react-router-preset';
 
 /**
  * React Router 7.9.x Configuration for Hydrogen
@@ -9,5 +9,6 @@ import {hydrogenPreset} from '@shopify/hydrogen/react-router-preset';
  * validated performance optimizations while ensuring compatibility.
  */
 export default {
+  buildDirectory: 'build',
   presets: [hydrogenPreset()],
 } satisfies Config;
