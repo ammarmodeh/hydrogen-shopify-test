@@ -1,5 +1,6 @@
 import type { Config } from '@react-router/dev/config';
 import { hydrogenPreset } from '@shopify/hydrogen/react-router-preset';
+import { vercelPreset } from '@vercel/react-router/vite';
 
 /**
  * React Router 7.9.x Configuration for Hydrogen
@@ -9,5 +10,8 @@ import { hydrogenPreset } from '@shopify/hydrogen/react-router-preset';
  * validated performance optimizations while ensuring compatibility.
  */
 export default {
-  presets: [hydrogenPreset()],
+  presets: [
+    hydrogenPreset(),
+    process.env.VERCEL && vercelPreset(),
+  ].filter(Boolean),
 } satisfies Config;
