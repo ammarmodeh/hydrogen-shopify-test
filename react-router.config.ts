@@ -10,6 +10,5 @@ import { vercelPreset } from '@vercel/react-router/vite';
  * validated performance optimizations while ensuring compatibility.
  */
 export default {
-  buildDirectory: 'build',
   presets: [hydrogenPreset(), vercelPreset()],
 } satisfies Config;
